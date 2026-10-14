@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN" data-visual-style="ink">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ece8dc"><link rel="icon" href="data:,">
+<title>无名战神：三国无双 · 开发原型</title>
+<link rel="stylesheet" href="./src/war/style.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
+</head>
+<body>
+<canvas id="c" aria-label="三维战场"></canvas>
+<main id="lobby" class="screen">
+  <header><span class="kicker">水墨 · 战场 · 装备构筑</span><h1>无名战神</h1><p class="subtitle">三国无双 <span>开发代号 · 成长战场原型</span></p><p>从无名新卒，到阵前万人敌。<br>为自己立名，不再扮演某位历史名将。</p></header>
+  <section class="camp-card">
+    <form id="create-form">
+      <div class="form-top"><label for="player-name">你的武将名</label><span id="save-state">本地角色</span></div>
+      <input id="player-name" maxlength="12" autocomplete="off" value="无名" required>
+      <fieldset><legend>选择出身 · 首版共用长枪动作</legend><div id="origin-options" class="origin-options"></div></fieldset>
+      <label class="line-label">披风配色 <select id="palette"><option value="jade">青玉</option><option value="vermilion">朱砂</option><option value="indigo">靛蓝</option></select></label>
+      <div class="form-options"><label>战场兵力 <select id="enemy-count"><option value="80">80（低负载）</option><option value="160" selected>160（测试档）</option><option value="300">300（高负载）</option></select></label><label>画质 <select id="quality"><option value="low">低</option><option value="medium" selected>中</option><option value="high">高</option></select></label></div>
+      <p id="camp-record" class="muted"></p>
+      <button id="deploy" class="primary" type="submit">持枪出征</button>
+    </form>
+    <div class="camp-footer"><button id="camp-bag" type="button">整理行囊</button><button id="new-profile" type="button">重新创建角色</button></div>
+    <p class="fine">击杀升级，靠近拾取装备；空栏位自动穿戴，已有装备由你决定替换。死亡保留已拾取装备与等级。仅当前浏览器保存，无云存档。</p>
+  </section>
+  <footer><span>移动 WASD · 普攻 J · 重击 K · 闪避 L · 无双 I · 行囊 B</span><small>触屏设备自动显示摇杆。横屏体验更佳。</small><a href="./ink.html">返回上一阶段画面实验</a></footer>
+</main>
+<div id="loading" class="modal" hidden><section class="sheet"><span class="kicker">整军备战</span><h2>你的战场，即将展开</h2><p id="loading-text">正在加载三维引擎和战场资源…</p><p class="fine">首次加载较慢。请保持页面前台。</p></section></div>
+<div id="war-hud" hidden>
+  <div class="hero-status"><div class="hero-line"><b id="hud-name"></b><span id="hud-rank"></span><strong id="hud-level"></strong></div><div class="meter hp"><i id="hp-fill"></i><span id="hp-text"></span></div><div class="meter rage"><i id="rage-fill"></i></div><div class="meter xp"><i id="xp-fill"></i></div><small id="hud-count"></small></div>
+  <div class="objective"><b id="objective-text"></b><small id="objective-sub"></small></div>
+  <div class="boss-status" id="boss-status" hidden><b id="boss-name"></b><div class="meter enemy"><i id="boss-fill"></i></div></div>
+  <div class="battle-tools"><button id="bag-button">行囊 <span id="bag-count"></span></button><button id="pause-button">暂停</button></div>
+  <canvas id="war-map" width="120" height="100" aria-label="附近敌我与首领位置"></canvas>
+  <button id="challenge-button" hidden>挑战统帅</button>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="build-tags"></div>
+</div>
+<div id="hud" hidden></div>
+<div id="menu" class="modal" hidden>
+  <section class="sheet inventory-sheet" role="dialog" aria-modal="true" aria-labelledby="menu-title">
+    <header class="sheet-head"><div><span class="kicker">战局已暂停</span><h2 id="menu-title">行囊与装备</h2></div><button id="go">返回战场</button></header>
+    <p id="stat-line"></p><div id="slot-bar"></div>
+    <div class="inventory-body"><div id="bag-list" class="bag-list"></div><div id="item-detail" class="item-detail"></div></div>
+    <footer class="sheet-footer"><span id="scrap-line"></span><button id="quit">撤回营地</button></footer>
+  </section>
+</div>
+<div id="result" class="modal" hidden><section class="sheet result-sheet"><span class="kicker">此战已记</span><h2 id="result-title"></h2><p id="result-summary"></p><p id="result-reward"></p><p class="fine">等级与已拾取装备保留。地面未拾取战利品不会带回。</p><button id="return-camp" class="primary">返回营地</button></section></div>
+<div id="fatal" class="modal" hidden><section class="sheet"><h2>战场暂时未能启动</h2><p id="fatal-text"></p><p>请通过完整仓库的 HTTP 服务打开此页面，使用支持 WebGL2 的浏览器。角色存档不会因此删除。</p><button id="fatal-back">返回营地</button></section></div>
+<script type="module" src="./src/war/boot.js"></script>
+</body></html>
