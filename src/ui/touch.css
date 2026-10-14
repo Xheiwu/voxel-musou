@@ -1,0 +1,35 @@
+/* Scoped mobile controls. UI stays outside WebGL and leaves the center unobstructed. */
+html.musou-touch-device { --mt-paper: #efe9d9; --mt-ink: #272723; --mt-seal: #a53629; }
+html.musou-touch-device, .musou-touch-device body { overscroll-behavior: none; }
+.musou-touch-device canvas#c { touch-action: none; }
+.musou-touch { position: fixed; inset: 0; z-index: 35; pointer-events: none; user-select: none; -webkit-user-select: none; }
+.musou-touch[hidden] { display: none !important; }
+.musou-touch button, .mt-stick { touch-action: none; pointer-events: auto; -webkit-tap-highlight-color: transparent; }
+.musou-touch button { appearance: none; color: var(--mt-paper); border: 1px solid #c8baa2; background: #272723d9;
+  font: 700 15px/1.1 "KaiTi", "STKaiti", serif; border-radius: 50%; padding: 0; box-shadow: inset 0 0 0 3px #efe9d918; }
+.musou-touch button.down { background: var(--mt-seal); transform: scale(.94); }
+.mt-stick { position: absolute; width: clamp(88px, 20vh, 126px); height: clamp(88px, 20vh, 126px);
+  left: max(22px, env(safe-area-inset-left)); bottom: max(24px, env(safe-area-inset-bottom));
+  border-radius: 50%; background: #27272333; border: 1px solid #27272366; display: grid; place-items: center; }
+.mt-stick i { display: block; width: 42%; height: 42%; border-radius: 50%; background: #282925ac; border: 1px solid #efe9d9a0; pointer-events: none; }
+.mt-actions { position: absolute; right: max(14px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom));
+  display: grid; grid-template-columns: repeat(3, clamp(45px, 12vh, 67px)); gap: 9px; align-items: center; }
+.mt-actions button { width: clamp(45px, 12vh, 67px); height: clamp(45px, 12vh, 67px); }
+.mt-actions [data-action="attack"] { background: #8f342be6; border-color: #efd8b0; font-size: 18px; }
+.mt-actions [data-action="musou"] { color: #f6c790; border-color: #c99163; }
+.mt-actions [data-action="jump"], .mt-actions [data-action="target"] { font-size: 12px; transform: scale(.85); }
+.musou-touch .mt-pause { position: absolute; right: max(16px, env(safe-area-inset-right)); top: max(12px, env(safe-area-inset-top));
+  border-radius: 5px; width: 48px; height: 36px; font-size: 13px; }
+.mt-rotate { display: none; }
+@media (orientation: portrait) {
+  .mt-rotate { display: block; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    background: #272723d9; color: #efe9d9; padding: 8px 14px; border-radius: 4px; font: 13px sans-serif; }
+}
+/* Compact only the persistent desktop HUD on narrow/touch screens. */
+.musou-touch-device #hud .h-intro { display: none; }
+.musou-touch-device #hud .h-player { transform: scale(.58); transform-origin: left bottom; bottom: 150px; width: 165%; }
+@media (max-height: 500px) {
+  .musou-touch-device #hud .h-player { bottom: 125px; transform: scale(.5); width: 190%; }
+  .musou-touch-device #hud .h-map { transform: scale(.65); transform-origin: right top; right: 70px; }
+}
+@media (prefers-reduced-motion: reduce) { .musou-touch button.down { transform: none; } }

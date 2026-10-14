@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ink Musou input contract test — not a game preview</title>
+<style>body{margin:0;background:#eeeae0;font:16px sans-serif}#c{position:fixed;inset:0;width:100%;height:100%}#test-note{position:fixed;left:16px;top:12px;pointer-events:none;color:#333}#menu{position:fixed;left:40%;top:35%}</style></head>
+<body><canvas id="c"></canvas><p id="test-note">INPUT TEST ONLY · 非游戏画面<br>拖动左摇杆，同时按攻击；空白处拖动镜头。</p>
+<div id="menu" hidden><button id="go">继续</button></div>
+<script type="module">
+import { createInput } from '../src/core/input.js';
+import { emit } from '../src/core/events.js';
+const input = createInput();
+window.inkTest = { sample: () => structuredClone(input.sample()), flow: state => emit('flow', { state }),
+  pause: v => { document.getElementById('menu').hidden = !v; } };
+document.getElementById('go').onclick = () => window.inkTest.pause(false);
+addEventListener('blur', () => window.inkTest.pause(true));
+emit('flow', { state: 'battle' });
+</script></body></html>

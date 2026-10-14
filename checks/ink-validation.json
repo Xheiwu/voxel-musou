@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-14",
+  "scope": "in-memory Chromium input harness; not a full game playtest",
+  "syntax": "passed",
+  "input_ui_passed": 20,
+  "tests": [
+    {"name": "mobile overlay shown", "result": "passed"},
+    {"name": "mobile does not request pointer lock", "result": "passed"},
+    {"name": "real multitouch: move and attack simultaneously", "result": "passed"},
+    {"name": "hold normal attack repeats as held input", "result": "passed"},
+    {"name": "touch release clears movement and held state", "result": "passed"},
+    {"name": "quick charge tap is latched", "result": "passed"},
+    {"name": "tap latch consumed exactly once", "result": "passed"},
+    {"name": "pointer cancel leaves no phantom attack", "result": "passed"},
+    {"name": "world swipe moves camera without attacking", "result": "passed"},
+    {"name": "pause hides controls and clears held inputs", "result": "passed"},
+    {"name": "resume does not replay an old attack", "result": "passed"},
+    {"name": "keyboard attack contract preserved", "result": "passed"},
+    {"name": "multiple keys bound to dodge do not release one another", "result": "passed"},
+    {"name": "gamepad pressed and held both forwarded", "result": "passed"},
+    {"name": "title scene disables gameplay overlay", "result": "passed"},
+    {"name": "portrait rotation hint visible", "result": "passed"},
+    {"name": "portrait controls within viewport: .mt-stick", "result": "passed"},
+    {"name": "portrait controls within viewport: .mt-actions", "result": "passed"},
+    {"name": "ink GLSL compile/link", "result": "blocked"},
+    {"name": "no JavaScript page errors", "result": "passed"},
+    {"name": "desktop retains non-touch layout", "result": "passed"}
+  ],
+  "not_verified": ["WebGL2 shader compile/link", "full battlefield render", "campaign regression", "real phone performance", "HTTP/module asset integration"]
+}
