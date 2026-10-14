@@ -1,35 +1,77 @@
-/* Scoped mobile controls. UI stays outside WebGL and leaves the center unobstructed. */
-html.musou-touch-device { --mt-paper: #efe9d9; --mt-ink: #272723; --mt-seal: #a53629; }
-html.musou-touch-device, .musou-touch-device body { overscroll-behavior: none; }
-.musou-touch-device canvas#c { touch-action: none; }
-.musou-touch { position: fixed; inset: 0; z-index: 35; pointer-events: none; user-select: none; -webkit-user-select: none; }
-.musou-touch[hidden] { display: none !important; }
-.musou-touch button, .mt-stick { touch-action: none; pointer-events: auto; -webkit-tap-highlight-color: transparent; }
-.musou-touch button { appearance: none; color: var(--mt-paper); border: 1px solid #c8baa2; background: #272723d9;
-  font: 700 15px/1.1 "KaiTi", "STKaiti", serif; border-radius: 50%; padding: 0; box-shadow: inset 0 0 0 3px #efe9d918; }
-.musou-touch button.down { background: var(--mt-seal); transform: scale(.94); }
-.mt-stick { position: absolute; width: clamp(88px, 20vh, 126px); height: clamp(88px, 20vh, 126px);
-  left: max(22px, env(safe-area-inset-left)); bottom: max(24px, env(safe-area-inset-bottom));
-  border-radius: 50%; background: #27272333; border: 1px solid #27272366; display: grid; place-items: center; }
-.mt-stick i { display: block; width: 42%; height: 42%; border-radius: 50%; background: #282925ac; border: 1px solid #efe9d9a0; pointer-events: none; }
-.mt-actions { position: absolute; right: max(14px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom));
-  display: grid; grid-template-columns: repeat(3, clamp(45px, 12vh, 67px)); gap: 9px; align-items: center; }
-.mt-actions button { width: clamp(45px, 12vh, 67px); height: clamp(45px, 12vh, 67px); }
-.mt-actions [data-action="attack"] { background: #8f342be6; border-color: #efd8b0; font-size: 18px; }
-.mt-actions [data-action="musou"] { color: #f6c790; border-color: #c99163; }
-.mt-actions [data-action="jump"], .mt-actions [data-action="target"] { font-size: 12px; transform: scale(.85); }
-.musou-touch .mt-pause { position: absolute; right: max(16px, env(safe-area-inset-right)); top: max(12px, env(safe-area-inset-top));
-  border-radius: 5px; width: 48px; height: 36px; font-size: 13px; }
-.mt-rotate { display: none; }
-@media (orientation: portrait) {
-  .mt-rotate { display: block; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-    background: #272723d9; color: #efe9d9; padding: 8px 14px; border-radius: 4px; font: 13px sans-serif; }
+/* Mobile layout is reflowed, not a scaled desktop HUD. No external art/fonts. */
+html.musou-touch-device { --mt-paper:#f0ebdd; --mt-ink:#252a28; --mt-seal:#a33c30; --mt-button:clamp(50px,14vh,68px); }
+html.musou-touch-device,.musou-touch-device body { overscroll-behavior:none; }
+.musou-touch-device canvas#c { touch-action:none; }
+html[data-visual-style="ink"] canvas#c { image-rendering:auto; }
+.musou-touch { position:fixed; inset:0; z-index:35; pointer-events:none; user-select:none; -webkit-user-select:none; }
+.musou-touch[hidden] { display:none!important; }
+.musou-touch button,.mt-stick { touch-action:none; pointer-events:auto; -webkit-tap-highlight-color:transparent; }
+.musou-touch button { appearance:none; color:var(--mt-paper); border:1px solid #c9bc9f; background:#242b28ed;
+  font:700 15px/1.1 "KaiTi","STKaiti",serif; border-radius:50%; padding:0; box-shadow:inset 0 0 0 3px #f0ebdd15,0 2px 7px #0003; }
+.musou-touch button.down { background:var(--mt-seal); box-shadow:inset 0 0 0 3px #fff5; }
+.mt-stick { position:absolute; width:clamp(100px,28vh,136px); height:clamp(100px,28vh,136px);
+  left:calc(22px + env(safe-area-inset-left)); bottom:calc(20px + env(safe-area-inset-bottom));
+  border-radius:50%; background:#252a2826; border:1px solid #252a2877; display:grid; place-items:center; }
+.mt-stick i { width:42%; height:42%; border-radius:50%; background:#252a28bb; border:1px solid #f0ebddaa; pointer-events:none; }
+.mt-actions { position:absolute; right:calc(16px + env(safe-area-inset-right)); bottom:calc(18px + env(safe-area-inset-bottom));
+  display:grid; grid-template-columns:repeat(3,var(--mt-button)); grid-template-rows:repeat(2,var(--mt-button)); gap:8px; align-items:center; justify-items:center; }
+.mt-actions button { width:var(--mt-button); height:var(--mt-button); }
+.mt-actions [data-action="attack"] { background:#943b30ef; border-color:#ecd5a4; font-size:18px; }
+.mt-actions [data-action="musou"] { color:#f5d294; border-color:#c4a671; }
+/* Secondary actions keep a 44px touch target instead of being scaled below finger size. */
+.mt-actions [data-action="jump"],.mt-actions [data-action="target"] { width:44px; height:44px; font-size:12px; background:#252a2899; }
+.musou-touch .mt-pause { position:absolute; right:calc(12px + env(safe-area-inset-right)); top:calc(10px + env(safe-area-inset-top));
+  width:48px; height:44px; font-size:13px; border-radius:8px; }
+.mt-rotate { display:none; }
+.musou-touch-device #hud { font-size:12px; text-shadow:0 1px 2px #000b; }
+.musou-touch-device #hud .h-intro,.musou-touch-device #hud .h-copy { display:none; }
+.musou-touch-device #hud .h-player { transform:none; left:calc(12px + env(safe-area-inset-left)); right:auto; top:calc(10px + env(safe-area-inset-top));
+  bottom:auto; width:190px; height:61px; background:#222a28de; border-radius:7px; padding:0; box-shadow:0 1px 5px #0002; }
+.musou-touch-device #hud .h-player .badge { left:7px; top:9px; bottom:auto; width:38px; height:38px; border:1px solid #d1c3a0; box-shadow:none; }
+.musou-touch-device #hud .h-player .badge canvas { width:36px; height:36px; left:1px; bottom:0; }
+.musou-touch-device #hud .h-player .name { position:absolute; left:54px; top:5px; bottom:auto; font-size:14px; line-height:16px; letter-spacing:2px; }
+.musou-touch-device #hud .h-player .hp { left:54px; top:25px; right:auto; bottom:auto; width:126px; height:8px; transform:none; }
+.musou-touch-device #hud .h-player .mu { position:absolute; display:flex; gap:3px; left:54px; top:41px; bottom:auto; width:126px; height:7px; transform:none; }
+.musou-touch-device #hud .h-player .mu>div { position:relative; inset:auto; flex:1; width:auto; height:7px; margin:0; transform:none; background:#1119; border:1px solid #d3bb7944; }
+.musou-touch-device #hud .h-player .mu>div i { position:absolute; inset:0; background:#d4b266; transform-origin:left; }
+.musou-touch-device #hud .h-player .mu>span { display:none; }
+.musou-touch-device #hud .h-map { transform:none; left:auto; top:calc(10px + env(safe-area-inset-top)); right:calc(70px + env(safe-area-inset-right)); bottom:auto; width:88px; height:100px; }
+.musou-touch-device #hud .h-map canvas { position:absolute; top:12px; left:0; width:88px; height:88px; }
+.musou-touch-device #hud .h-map .morale { position:absolute; top:0; left:0; width:88px; height:8px; }
+.musou-touch-device #hud .h-map>.seal,.musou-touch-device #hud .h-map .morale span { display:none; }
+.musou-touch-device #hud .h-obj { left:calc(12px + env(safe-area-inset-left)); right:calc(176px + env(safe-area-inset-right)); top:calc(78px + env(safe-area-inset-top)); bottom:auto; font-size:14px; line-height:1.5; padding:4px 6px; max-width:420px; }
+.musou-touch-device #hud .h-obj small { display:none; }
+.musou-touch-device #hud .h-obj b { font-size:14px; letter-spacing:1px; }
+.musou-touch-device #hud .h-obj .go { position:relative; inset:auto; margin-left:12px; font-size:12px; }
+.musou-touch-device #hud .h-obj .tm { position:relative; inset:auto; font-size:12px; }
+.musou-touch-device #hud .h-boss { left:218px; right:176px; top:calc(10px + env(safe-area-inset-top)); width:auto; max-width:300px; transform:none; }
+.musou-touch-device #hud .h-boss .nm b { font-size:18px; }
+.musou-touch-device #hud .h-boss .nm span { display:none; }
+.musou-touch-device #hud .h-chain { left:calc(16px + env(safe-area-inset-left)); top:128px; bottom:auto; transform:scale(.7); transform-origin:left top; }
+.musou-touch-device #hud .h-ko { left:auto; right:calc(20px + env(safe-area-inset-right)); top:118px; bottom:auto; transform:scale(.65); transform-origin:right top; }
+.musou-touch-device #hud .h-dlg { left:22%; right:22%; bottom:12px; max-width:56%; }
+.musou-touch-device #hud .h-dlg small { display:none; }
+@media (orientation:portrait) {
+  .mt-rotate { display:block; position:absolute; top:122px; left:50%; transform:translateX(-50%); white-space:nowrap;
+    background:#252a28dd; color:#f0ebdd; padding:7px 12px; border-radius:6px; font:12px sans-serif; }
+  .mt-stick { left:14px; bottom:24px; width:102px; height:102px; }
+  .mt-actions { right:10px; bottom:18px; --mt-button:50px; gap:6px; }
+  .musou-touch-device #hud .h-player { width:176px; }
+  .musou-touch-device #hud .h-player .hp,.musou-touch-device #hud .h-player .mu { width:111px; }
+  .musou-touch-device #hud .h-obj { right:120px; top:77px; }
+  .musou-touch-device #hud .h-boss { left:14px; right:14px; top:160px; }
+  .musou-touch-device #hud .h-chain { top:210px; }
+  .musou-touch-device #hud .h-ko { top:212px; }
+  .musou-touch-device #hud .h-dlg { left:12px; right:12px; bottom:156px; max-width:none; }
 }
-/* Compact only the persistent desktop HUD on narrow/touch screens. */
-.musou-touch-device #hud .h-intro { display: none; }
-.musou-touch-device #hud .h-player { transform: scale(.58); transform-origin: left bottom; bottom: 150px; width: 165%; }
-@media (max-height: 500px) {
-  .musou-touch-device #hud .h-player { bottom: 125px; transform: scale(.5); width: 190%; }
-  .musou-touch-device #hud .h-map { transform: scale(.65); transform-origin: right top; right: 70px; }
+@media (max-height:360px) and (orientation:landscape) {
+  .musou-touch-device #hud .h-chain,.musou-touch-device #hud .h-ko { display:none; }
+  .mt-stick { bottom:12px; width:100px; height:100px; }
 }
-@media (prefers-reduced-motion: reduce) { .musou-touch button.down { transform: none; } }
+@media (orientation:portrait) {
+  .musou-touch-device #hud .h-map { right:12px; top:76px; width:70px; height:82px; }
+  .musou-touch-device #hud .h-map canvas { width:70px; height:70px; }
+  .musou-touch-device #hud .h-map .morale { width:70px; }
+  .mt-rotate { top:auto; bottom:150px; }
+}
+.musou-touch-device #hud .h-obj { color:#f3ead4; background:linear-gradient(90deg,#25302be0,#25302b99); border-radius:5px; text-shadow:none; }

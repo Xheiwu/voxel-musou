@@ -1,9 +1,7 @@
 // Keyboard / mouse / gamepad / touch -> the existing fixed-step action contract.
-// No simulation state is changed here. Completed taps stay latched until sample().
 import { on } from './events.js';
 import { createTouchControls } from '../ui/touch.js';
-
-const ACTIONS = ['attack', 'charge', 'jump', 'dodge', 'musou', 'target'];
+import { ACTIONS, prioritizeActions } from './action-intent.js';
 const KEYMAP = { KeyJ: 'attack', KeyK: 'charge', Space: 'jump', KeyL: 'dodge',
   ShiftLeft: 'dodge', ShiftRight: 'dodge', KeyI: 'musou', KeyR: 'target' };
 const MOVEKEYS = { KeyW: [0, 1], ArrowUp: [0, 1], KeyS: [0, -1], ArrowDown: [0, -1],
@@ -11,7 +9,6 @@ const MOVEKEYS = { KeyW: [0, 1], ArrowUp: [0, 1], KeyS: [0, -1], ArrowDown: [0, 
 const PADMAP = { 0: 'jump', 2: 'attack', 3: 'charge', 1: 'musou', 5: 'dodge', 7: 'dodge', 4: 'target', 6: 'target' };
 const LOOK = { mouseYaw: 0.0024, mousePitch: 0.0018, keyRate: [0.9, 2.6], keyRamp: 21,
   padYaw: 2.8, padPitch: 1.3, padEase: 0.3, padDead: 0.18 };
-
 export function createInput() {
   const canvas = document.getElementById('c'), menu = document.getElementById('menu');
   const touch = createTouchControls(canvas, menu);
@@ -72,7 +69,6 @@ export function createInput() {
   });
   addEventListener('pointercancel', e => { if (e.pointerType !== 'touch') reset(); });
   addEventListener('pointermove', e => { if (locked() && live()) { dev.lookX += e.movementX; dev.lookY += e.movementY; } });
-
   function pollPad(active) {
     let p = null;
     try { p = navigator.getGamepads?.()?.[0] || null; } catch { /* restricted iframe */ }
@@ -80,15 +76,13 @@ export function createInput() {
     for (const [btn, a] of Object.entries(PADMAP)) {
       const down = !!p?.buttons[btn]?.pressed;
       if (active && down && !dev.pad[btn]) dev.latch[a] = true;
-      dev.pad[btn] = down;
-      held[a] = !!held[a] || (active && down);
+      dev.pad[btn] = down; held[a] = !!held[a] || (active && down);
     }
     return { p: active ? p : null, held };
   }
   return {
     sample() {
-      const active = live();
-      if (!active) reset();
+      const active = live(); if (!active) reset();
       const { p: pad, held: padHeld } = pollPad(active), t = touch.sample();
       let mx = t.mx, my = t.my, orbit = t.orbit, tilt = t.tilt;
       const keyHeld = {};
@@ -106,8 +100,7 @@ export function createInput() {
           wantYaw = -rx * k * LOOK.padYaw; wantPitch = ry * k * LOOK.padPitch;
         }
       }
-      dev.padYaw += (wantYaw - dev.padYaw) * LOOK.padEase;
-      dev.padPitch += (wantPitch - dev.padPitch) * LOOK.padEase;
+      dev.padYaw += (wantYaw - dev.padYaw) * LOOK.padEase; dev.padPitch += (wantPitch - dev.padPitch) * LOOK.padEase;
       if (!wantYaw && Math.abs(dev.padYaw) < 0.02) dev.padYaw = 0;
       if (!wantPitch && Math.abs(dev.padPitch) < 0.02) dev.padPitch = 0;
       orbit += dev.padYaw / 60; tilt += dev.padPitch / 60;
@@ -120,8 +113,8 @@ export function createInput() {
         out.held[a] = active && (!!keyHeld[a] || !!dev.mouse[a] || !!padHeld[a] || !!t.held[a]);
         dev.latch[a] = false;
       }
-      const length = Math.hypot(mx, my);
-      if (length > 1) { mx /= length; my /= length; }
+      prioritizeActions(out.pressed);
+      const length = Math.hypot(mx, my); if (length > 1) { mx /= length; my /= length; }
       out.mx = mx; out.my = my; out.orbit = orbit; out.tilt = tilt;
       return out;
     },

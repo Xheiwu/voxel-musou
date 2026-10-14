@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>水墨演武 · 实验入口</title>
+<style>
+:root{color-scheme:light;font-family:"KaiTi","STKaiti",serif;color:#28322e;background:#eee9dc}*{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;padding:24px}main{width:min(600px,100%)}.seal{display:inline-block;border:2px solid #9c3d32;color:#9c3d32;padding:4px 8px;font-size:14px;letter-spacing:3px}h1{font-size:clamp(40px,10vw,66px);font-weight:700;letter-spacing:.13em;margin:16px 0}p{font-size:16px;line-height:1.8;color:#5b645c}form{border-top:1px solid #b7b7a4;padding-top:18px}label{display:block;margin:12px 0;font:15px/1.7 sans-serif}select{margin-left:12px;background:#faf7ee;border:1px solid #9a9f92;border-radius:5px;padding:8px;font:inherit;color:#28322e}button{border:0;border-radius:6px;background:#983c30;color:#fff5df;padding:14px 26px;font:700 18px serif;margin-top:14px;cursor:pointer}a{display:inline-block;color:#456d62;margin:18px 0;font-size:15px}small{display:block;font:12px/1.8 sans-serif;color:#6b7066}input{accent-color:#983c30}
+</style></head><body><main>
+<span class="seal">开发分支 · 实验版</span><h1>水墨演武</h1>
+<p>亲手冲阵，而不是自动站桩。<br>本入口用于测试水墨渲染、半俯视镜头和手机操作。</p>
+<form id="start">
+<label>敌军数量<select name="enemies"><option>80</option><option selected>160</option><option>300</option></select></label>
+<label>画质<select name="quality"><option value="low">低</option><option value="medium" selected>中</option><option value="high">高</option></select></label>
+<label><input type="checkbox" name="models" checked> 启用非体素赵云原型（小兵与地图尚未重制）</label>
+<label><input type="checkbox" name="perf"> 显示性能检测</label>
+<button type="submit">进入练习战场</button>
+</form><a href="./index.html">返回原版入口</a>
+<small>练习模式沿用原版规则：角色不会死亡，不记录战役通关。<br>3D 渲染与真实手机帧率尚待实机验收。新模型和镜头为实验选项，不代表完整美术重制。</small>
+</main><script>
+document.getElementById('start').addEventListener('submit',e=>{
+ e.preventDefault();const form=new FormData(e.currentTarget),url=new URL('./index.html',location.href);
+ url.search=new URLSearchParams({style:'ink',camera:'battle',go:'free',char:'zhaoyun',enemies:form.get('enemies'),quality:form.get('quality')}).toString();
+ if(form.has('models'))url.searchParams.set('models','ink');if(form.has('perf'))url.searchParams.set('perf','1');location.assign(url.href);
+});
+</script></body></html>

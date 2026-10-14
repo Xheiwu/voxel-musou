@@ -1,6 +1,6 @@
-// Touch is an input adapter only: it never edits hero, camera or combat state.
-// Multiple pointer IDs allow moving + attacking + looking at the same time.
+// Touch is an input adapter; multiple pointer IDs support movement + combat + look.
 import { on } from '../core/events.js';
+import { ACTIONS, createAttackRepeater, prioritizeActions } from '../core/action-intent.js';
 
 export function createTouchControls(canvas, menu) {
   const params = new URLSearchParams(location.search);
@@ -8,7 +8,6 @@ export function createTouchControls(canvas, menu) {
     (params.get('touch') !== '0' && matchMedia('(any-pointer: coarse)').matches);
   const out = { mx: 0, my: 0, orbit: 0, tilt: 0, held: {}, pressed: {} };
   if (!enabled) return { enabled, sample: () => out, reset() {} };
-
   document.documentElement.classList.add('musou-touch-device');
   const css = document.createElement('link');
   css.rel = 'stylesheet'; css.href = new URL('./touch.css', import.meta.url).href;
@@ -22,7 +21,7 @@ export function createTouchControls(canvas, menu) {
     <div class="mt-actions">
       <button type="button" data-action="jump" aria-label="跳跃">跃</button>
       <button type="button" data-action="musou" aria-label="释放无双">无双</button>
-      <button type="button" data-action="charge" aria-label="蓄力攻击">蓄力</button>
+      <button type="button" data-action="charge" aria-label="重击，衔接普攻可派生招式">重击</button>
       <button type="button" data-action="target" aria-label="镜头回正或锁定敌将">回正</button>
       <button type="button" data-action="dodge" aria-label="闪避">闪避</button>
       <button type="button" data-action="attack" aria-label="普通攻击，按住连击">攻击</button>
@@ -31,15 +30,15 @@ export function createTouchControls(canvas, menu) {
     <span class="mt-rotate">横屏体验更佳</span>`;
   document.body.append(root);
   const stick = root.querySelector('.mt-stick'), thumb = stick.querySelector('i');
-  const actions = new Map(), held = {}, latch = {};
+  const actions = new Map(), held = {}, latch = {}, repeater = createAttackRepeater();
   let battle = false, moveId = null, lookId = null;
-  let mx = 0, my = 0, lookX = 0, lookY = 0, lastX = 0, lastY = 0, repeat = 0;
+  let mx = 0, my = 0, lookX = 0, lookY = 0, lastX = 0, lastY = 0;
   const live = () => battle && !!menu?.hidden && !document.hidden;
-  const capture = (el, id) => { try { el.setPointerCapture(id); } catch { /* canceled pointer */ } };
+  const capture = (el, id) => { try { el.setPointerCapture(id); } catch { /* cancelled pointer */ } };
   function reset() {
-    actions.clear(); moveId = lookId = null; mx = my = lookX = lookY = repeat = 0;
-    for (const a of Object.keys(held)) held[a] = false;
-    for (const a of Object.keys(latch)) latch[a] = false;
+    actions.clear(); moveId = lookId = null; mx = my = lookX = lookY = 0;
+    repeater.reset();
+    for (const a of ACTIONS) { held[a] = false; latch[a] = false; }
     root.querySelectorAll('.down').forEach(el => el.classList.remove('down'));
     thumb.style.transform = 'translate(0px, 0px)';
   }
@@ -52,7 +51,6 @@ export function createTouchControls(canvas, menu) {
   root.querySelector('.mt-pause').addEventListener('pointerdown', e => {
     e.preventDefault(); e.stopPropagation(); reset(); dispatchEvent(new Event('blur'));
   });
-
   function move(e) {
     const r = stick.getBoundingClientRect(), radius = r.width * 0.35;
     const dx = e.clientX - r.left - r.width / 2, dy = e.clientY - r.top - r.height / 2;
@@ -80,8 +78,9 @@ export function createTouchControls(canvas, menu) {
     button.addEventListener('pointerdown', e => {
       e.preventDefault(); e.stopPropagation();
       if (!live()) return;
-      actions.set(e.pointerId, a); held[a] = true; latch[a] = true;
-      if (a === 'attack') repeat = 12;
+      actions.set(e.pointerId, a); held[a] = true; latch[a] = true; repeater.press(a);
+      // A completed earlier ordinary tap must not overwrite a new explicit heavy input.
+      prioritizeActions(latch);
       button.classList.add('down'); capture(button, e.pointerId);
     });
     const release = e => {
@@ -89,12 +88,10 @@ export function createTouchControls(canvas, menu) {
       actions.delete(e.pointerId);
       held[a] = [...actions.values()].includes(a);
       button.classList.toggle('down', held[a]);
-      // Keep a completed tap latched until sample(); cancel must NOT leave a phantom attack.
       if (e.type === 'pointercancel') latch[a] = false;
     };
     for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(type, release);
   }
-  // Drag the unoccupied playfield to orbit. Touching the world is never a mouse attack.
   canvas.addEventListener('pointerdown', e => {
     if (e.pointerType !== 'touch' || !live() || lookId !== null) return;
     e.preventDefault(); lookId = e.pointerId; lastX = e.clientX; lastY = e.clientY;
@@ -105,21 +102,21 @@ export function createTouchControls(canvas, menu) {
     e.preventDefault(); lookX += e.clientX - lastX; lookY += e.clientY - lastY;
     lastX = e.clientX; lastY = e.clientY;
   });
-  const releaseLook = e => { if (e.pointerId === lookId) { lookId = null; if (e.type === 'pointercancel') lookX = lookY = 0; } };
+  const releaseLook = e => {
+    if (e.pointerId !== lookId) return;
+    lookId = null; if (e.type === 'pointercancel') lookX = lookY = 0;
+  };
   for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(type, releaseLook);
-
   return {
     enabled, reset,
     sample() {
       if (!live()) reset();
       out.mx = mx; out.my = my;
       out.orbit = Math.max(-0.18, Math.min(0.18, -lookX * 0.004));
-      out.tilt = Math.max(-0.12, Math.min(0.12, lookY * 0.003));
-      lookX = lookY = 0;
-      if (held.attack && !held.charge && --repeat <= 0) { latch.attack = true; repeat = 12; }
-      for (const a of ['attack', 'charge', 'jump', 'dodge', 'musou', 'target']) {
-        out.held[a] = !!held[a]; out.pressed[a] = !!latch[a]; latch[a] = false;
-      }
+      out.tilt = Math.max(-0.12, Math.min(0.12, lookY * 0.003)); lookX = lookY = 0;
+      if (repeater.sample(held, latch)) latch.attack = true;
+      prioritizeActions(latch);
+      for (const a of ACTIONS) { out.held[a] = !!held[a]; out.pressed[a] = !!latch[a]; latch[a] = false; }
       return out;
     },
   };
