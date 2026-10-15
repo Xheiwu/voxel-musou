@@ -2,10 +2,13 @@ import {createProfile,equipItem,salvageItem,temperItem,claimRewards} from './pro
 import {cleanName,ORIGINS,PALETTES} from './data.js';
 import {loadProfile,saveProfile,browserStorage} from './store.js';
 import {createWarUI} from './ui.js';
+import {initWarViewport} from './viewport.js';
+const viewport=initWarViewport();
 const storage=browserStorage(),loaded=loadProfile(storage);let profile=loaded.profile,engine=null,busy=false;
 const ui=createWarUI({
   async start(options){
     if(busy)return;
+    if(viewport.refresh().portrait){ui.notice('请先横屏，再持枪出征。');return;}
     if(profile?.rewards.length>=8){ui.notice('先整理行囊领取暂存奖励。');return;}
     busy=true;
     if(!profile)profile=createProfile(options);

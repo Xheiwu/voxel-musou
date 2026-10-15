@@ -1,0 +1,106 @@
+/* A 20:9 safe-area-contained frame. Loaded ONLY by war.html; never stretch or rotate the DOM. */
+html[data-war-layout="landscape"] { background:#171e1b; --war-pad:clamp(8px,calc(12 * var(--war-unit)),18px); }
+html[data-war-layout="landscape"] body { background:#171e1b; }
+html[data-war-layout="landscape"] :is(#c,#lobby,#war-hud,#menu,#result,#fatal,#loading,.musou-touch) {
+  position:fixed; inset:auto; left:var(--war-x); top:var(--war-y); width:var(--war-width); height:var(--war-height);
+}
+html[data-war-layout="landscape"] #c { image-rendering:auto; }
+html[data-war-layout="landscape"] .musou-touch { --mt-button:clamp(50px,calc(67 * var(--war-unit)),76px); }
+html[data-war-layout="landscape"] .musou-touch .mt-stick {
+  left:var(--war-pad); bottom:var(--war-pad); width:clamp(102px,calc(150 * var(--war-unit)),170px); height:clamp(102px,calc(150 * var(--war-unit)),170px);
+}
+html[data-war-layout="landscape"] .musou-touch .mt-actions { right:var(--war-pad); bottom:var(--war-pad); gap:8px; }
+html[data-war-layout="landscape"] .musou-touch .mt-actions button { min-height:44px; }
+html[data-war-layout="landscape"] .musou-touch :is(.mt-pause,.mt-rotate) { display:none; }
+/* Only one pause control, wired to the real inventory/pause UI. No duplicated touch pause. */
+html[data-war-layout="landscape"] #pause-button { display:block; }
+html[data-war-layout="landscape"] .hero-status { top:var(--war-pad); left:var(--war-pad); width:clamp(192px,calc(255 * var(--war-unit)),280px); padding:8px 10px; }
+html[data-war-layout="landscape"] .hero-line { font-size:13px; }
+html[data-war-layout="landscape"] .hero-line span { display:inline; }
+html[data-war-layout="landscape"] .hero-line>b { max-width:94px; }
+html[data-war-layout="landscape"] .objective { top:calc(var(--war-pad) + 100px); left:var(--war-pad); max-width:calc(var(--war-width) * .30); font-size:12px; }
+html[data-war-layout="landscape"] .objective small { line-height:1.35; }
+html[data-war-layout="landscape"] #build-tags { top:calc(var(--war-pad) + 156px); left:var(--war-pad); max-width:calc(var(--war-width) * .30); }
+html[data-war-layout="landscape"] .boss-status { top:var(--war-pad); left:50%; transform:translateX(-50%); width:clamp(175px,calc(var(--war-width) * .23),280px); }
+html[data-war-layout="landscape"] .battle-tools { top:var(--war-pad); right:var(--war-pad); gap:5px; }
+html[data-war-layout="landscape"] .battle-tools button { min-width:44px; min-height:44px; padding:6px 9px; }
+html[data-war-layout="landscape"] #war-map { top:calc(var(--war-pad) + 52px); right:var(--war-pad); width:96px; height:80px; }
+html[data-war-layout="landscape"] #challenge-button { top:auto; bottom:var(--war-pad); right:auto; left:50%; transform:translateX(-50%); min-height:44px; max-width:220px; }
+html[data-war-layout="landscape"] #toast { top:calc(var(--war-pad) + 75px); max-width:40%; font-size:12px; }
+/* Menus share the frame but scroll their contents, not the entire battlefield. */
+html[data-war-layout="landscape"] #lobby {
+  grid-template-columns:minmax(160px,.85fr) minmax(330px,1.4fr); grid-template-rows:minmax(0,1fr) auto;
+  align-content:stretch; gap:12px 4%; padding:calc(var(--war-pad) + 8px) 4%; overflow:hidden;
+}
+html[data-war-layout="landscape"] #lobby>header { overflow:auto; align-self:center; max-height:100%; }
+html[data-war-layout="landscape"] #lobby h1 { font-size:clamp(38px,calc(68 * var(--war-unit)),88px); }
+html[data-war-layout="landscape"] #lobby>footer { gap:12px; font-size:11px; }
+html[data-war-layout="landscape"] #lobby>footer button { min-height:44px; padding:6px 12px; margin-left:auto; }
+html[data-war-layout="landscape"] .camp-card { min-height:0; height:100%; padding:16px; display:flex; flex-direction:column; }
+html[data-war-layout="landscape"] #create-form { min-height:0; overflow:auto; flex:1; padding:1px 4px 3px 1px; }
+html[data-war-layout="landscape"] #deploy { position:sticky; bottom:0; z-index:1; box-shadow:0 -5px 9px var(--paper); }
+html[data-war-layout="landscape"] .camp-footer { margin-top:8px; flex-shrink:0; }
+html[data-war-layout="landscape"] .camp-card .fine { margin:7px 0 0; }
+html[data-war-layout="landscape"] .modal { padding:var(--war-pad); }
+html[data-war-layout="landscape"] .sheet { max-height:calc(var(--war-height) - var(--war-pad) * 2); }
+html[data-war-layout="landscape"] .inventory-sheet { height:100%; max-width:1150px; padding:12px; }
+html[data-war-layout="landscape"] .sheet-head { flex-shrink:0; }
+html[data-war-layout="landscape"] .sheet-head h2 { font-size:23px; }
+html[data-war-layout="landscape"] .inventory-body { grid-template-columns:minmax(170px,.9fr) minmax(260px,1.3fr); gap:10px; min-height:0; }
+html[data-war-layout="landscape"] .bag-list { grid-template-columns:repeat(2,minmax(0,1fr)); min-height:0; }
+html[data-war-layout="landscape"] .item-detail { padding:10px; }
+html[data-war-layout="landscape"] .item-detail h3 { font-size:21px; }
+html[data-war-layout="landscape"] .item-detail .detail-buttons { flex-wrap:nowrap; gap:5px; }
+html[data-war-layout="landscape"] .detail-buttons button { min-height:44px; font-size:12px; padding:6px 9px; }
+html[data-war-layout="landscape"] .sheet-footer { flex-shrink:0; margin-top:6px; }
+/* Use frame height, not device height: a 16:9 screen contains a shorter 20:9 frame. */
+html[data-war-compact="true"] #lobby>header>p:not(.subtitle) { font-size:14px; line-height:1.65; }
+html[data-war-compact="true"] #lobby>header .kicker { margin-bottom:8px; font-size:10px; }
+html[data-war-compact="true"] .camp-card { padding:10px; }
+html[data-war-compact="true"] .camp-card .fine,html[data-war-compact="true"] #lobby>footer>span { display:none; }
+html[data-war-compact="true"] fieldset { margin:9px 0; }
+html[data-war-compact="true"] .origin-card { min-height:70px; padding:7px; }
+html[data-war-compact="true"] .origin-card small { font-size:10px; margin-top:4px; }
+html[data-war-compact="true"] .origin-card b { font-size:13px; }
+html[data-war-compact="true"] #player-name { font-size:22px; padding:6px 4px; }
+html[data-war-compact="true"] .inventory-sheet { padding:8px 10px; }
+html[data-war-compact="true"] .sheet-head .kicker { display:none; }
+html[data-war-compact="true"] #stat-line { margin:5px 0; font-size:12px; }
+html[data-war-compact="true"] #slot-bar { margin-bottom:6px; flex-wrap:nowrap; overflow:auto; flex-shrink:0; }
+html[data-war-compact="true"] #slot-bar span { white-space:nowrap; font-size:10px; padding:4px 5px; }
+html[data-war-compact="true"] .bag-list { grid-template-columns:1fr; }
+html[data-war-compact="true"] .item-row { min-height:55px; padding:7px; }
+html[data-war-tiny="true"] .objective { top:calc(var(--war-pad) + 98px); font-size:11px; max-width:29%; }
+html[data-war-tiny="true"] #build-tags { display:none; }
+html[data-war-tiny="true"] #war-map { width:84px; height:70px; }
+html[data-war-tiny="true"] .hero-status { width:192px; }
+html[data-war-tiny="true"] .hero-line span { display:none; }
+html[data-war-tiny="true"] .boss-status { width:175px; }
+html[data-war-tiny="true"] #lobby>header>p:not(.subtitle),html[data-war-tiny="true"] .subtitle span { display:none; }
+html[data-war-tiny="true"] #lobby { gap:6px 3%; padding:8px 3%; }
+html[data-war-tiny="true"] .sheet-head h2 { font-size:20px; }
+html[data-war-tiny="true"] .item-detail h3 { font-size:18px; }
+/* Portrait is a paused orientation gate, not a squeezed portrait battle or rotated click surface. */
+#war-rotate { position:fixed; z-index:10000; left:var(--war-visual-x,0px); top:var(--war-visual-y,0px); width:var(--war-visual-width,100vw); height:var(--war-visual-height,100dvh); display:grid; place-items:center; background:#ece8dc; color:#26302d; padding:24px; overflow:auto; }
+#war-rotate[hidden] { display:none!important; }
+.rotate-card { width:100%; max-width:430px; text-align:center; }
+.rotate-card h2 { font-size:26px; margin:20px 0 12px; }
+.rotate-card p { font-size:14px; line-height:1.8; }
+.rotate-card small { display:block; margin:16px auto 0; font:12px/1.7 system-ui,sans-serif; color:#67716b; }
+.rotate-card button { min-height:48px; padding:10px 24px; background:#26302d; color:#f4f0e4; }
+.rotate-phone { display:block; width:116px; height:55px; margin:0 auto; border:3px solid #43877b; border-radius:11px; box-shadow:inset 0 0 0 5px #ece8dc,inset 0 0 0 6px #adbcb0; }
+html[data-war-portrait="true"] :is(#war-hud,.musou-touch) { visibility:hidden; }
+/* Creation's optional settings stay discoverable without competing with name/origin/deploy. */
+html[data-war-layout="landscape"] #war-options { border-top:1px solid var(--line); margin:5px 0; }
+html[data-war-layout="landscape"] #war-options summary { min-height:44px; display:list-item; align-content:center; cursor:pointer; font-size:13px; padding:10px 4px; }
+html[data-war-compact="true"] #camp-record { font-size:11px; margin:4px 0; }
+html[data-war-compact="true"] #lobby>footer>small { max-width:45%; }
+html[data-war-tiny="true"] .boss-status { width:clamp(135px,calc(var(--war-width) - 430px),175px); }
+html[data-war-micro="true"] .objective { top:calc(var(--war-pad) + 95px); width:32%; max-width:none; padding:4px 6px; }
+html[data-war-micro="true"] .objective b { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+html[data-war-micro="true"] .objective small { display:none; }
+html[data-war-micro="true"] #slot-bar { display:none; }
+html[data-war-micro="true"] #stat-line { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:3px 0; }
+html[data-war-micro="true"] .inventory-sheet { padding:6px; }
+html[data-war-micro="true"] .item-detail { padding:5px; }
+html[data-war-micro="true"] .detail-buttons { margin-top:3px; padding-top:3px; }
